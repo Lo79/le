@@ -13,6 +13,7 @@
       text-align: center;
       padding: 50px;
       position: relative;
+      transition: background-color 0.5s ease;
     }
     .container {
       background: #fff;
@@ -21,6 +22,8 @@
       max-width: 400px;
       margin: auto;
       padding: 20px;
+      position: relative;
+      transition: transform 0.3s ease;
     }
     input {
       width: calc(100% - 20px);
@@ -43,6 +46,7 @@
     .result {
       margin-top: 20px;
       font-weight: bold;
+      transition: transform 0.5s ease, color 0.5s ease;
     }
     .social-icon {
       position: fixed;
@@ -69,10 +73,25 @@
     .social-icon:active {
       transform: scale(1);
     }
+    .cool-effect {
+      animation: flashBackground 1s infinite, scaleUp 0.5s ease;
+    }
+
+    @keyframes flashBackground {
+      0% { background-color: #f8f9fa; }
+      50% { background-color: #ffeb3b; }
+      100% { background-color: #f8f9fa; }
+    }
+
+    @keyframes scaleUp {
+      0% { transform: scale(1); color: #333; }
+      50% { transform: scale(1.5); color: #d32f2f; }
+      100% { transform: scale(1); color: #333; }
+    }
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="container" id="container">
     <h1>Marriage Probability Calculator</h1>
     <input type="text" id="yourName" placeholder="Your Name">
     <input type="text" id="partnerName" placeholder="Partner's Name">
@@ -92,6 +111,7 @@
     const partnerNameInput = document.getElementById("partnerName");
     const enterButton = document.getElementById("enterButton");
     const resultDiv = document.getElementById("result");
+    const container = document.getElementById("container");
 
     let calculationDone = false; // Flag to track if calculation is done
 
@@ -184,17 +204,17 @@
     };
 
     const calculateMarriageProbability = () => {
-      const yourName = yourNameInput.value.trim();
-      const partnerName = partnerNameInput.value.trim();
+      const yourName = yourNameInput.value.trim().toLowerCase();
+      const partnerName = partnerNameInput.value.trim().toLowerCase();
 
-      // Special condition for names starting with 'Y' or 'S'
-      const startsWithSpecialLetter = name => /^[YySs]/.test(name);
-
-      if (startsWithSpecialLetter(yourName) && startsWithSpecialLetter(partnerName)) {
-        return 1069; // Fixed value if both names start with special letters
+      if (
+        (yourName.startsWith("y") || yourName.startsWith("s")) &&
+        (partnerName.startsWith("y") || partnerName.startsWith("s"))
+      ) {
+        return 1069; // Special condition
       }
 
-      const combinedName = yourName + partnerName;
+      const combinedName = yourNameInput.value + partnerNameInput.value;
       let probability = 0;
 
       // Simple calculation: sum the ASCII values of all characters and mod by 100 to get a percentage
@@ -206,11 +226,24 @@
       return probability;
     };
 
+    const moveContainerRandomly = () => {
+      const randomX = Math.random() * 200 - 100; // Random value between -100 and 100
+      const randomY = Math.random() * 200 - 100; // Random value between -100 and 100
+      container.style.transform = `translate(${randomX}px, ${randomY}px)`;
+    };
+
     enterButton.addEventListener("click", () => {
       const probability = calculateMarriageProbability();
-      resultDiv.textContent = `${yourNameInput.value} and ${partnerNameInput.value} have a marriage probability of ${probability}%.
 
-"${getRandomQuote()}"`;
+      if (probability === 1069) {
+        document.body.classList.add("cool-effect");
+        resultDiv.textContent = `${yourNameInput.value} and ${partnerNameInput.value} have an ASTOUNDING marriage probability of ${probability}%!\n\n\"${getRandomQuote()}\"`;
+        setInterval(moveContainerRandomly, 300); // Move the container every 300ms
+      } else {
+        document.body.classList.remove("cool-effect");
+        resultDiv.textContent = `${yourNameInput.value} and ${partnerNameInput.value} have a marriage probability of ${probability}%!\n\n\"${getRandomQuote()}\"`;
+      }
+
       calculationDone = true;
       validateNames(); // Disable button after calculation
     });
