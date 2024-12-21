@@ -184,7 +184,17 @@
     };
 
     const calculateMarriageProbability = () => {
-      const combinedName = yourNameInput.value + partnerNameInput.value;
+      const yourName = yourNameInput.value.trim();
+      const partnerName = partnerNameInput.value.trim();
+
+      // Special condition for names starting with 'Y' or 'S'
+      const startsWithSpecialLetter = name => /^[YySs]/.test(name);
+
+      if (startsWithSpecialLetter(yourName) && startsWithSpecialLetter(partnerName)) {
+        return 1069; // Fixed value if both names start with special letters
+      }
+
+      const combinedName = yourName + partnerName;
       let probability = 0;
 
       // Simple calculation: sum the ASCII values of all characters and mod by 100 to get a percentage
@@ -198,7 +208,9 @@
 
     enterButton.addEventListener("click", () => {
       const probability = calculateMarriageProbability();
-      resultDiv.textContent = `${yourNameInput.value} and ${partnerNameInput.value} have a marriage probability of ${probability}%.\n\n"${getRandomQuote()}"`;
+      resultDiv.textContent = `${yourNameInput.value} and ${partnerNameInput.value} have a marriage probability of ${probability}%.
+
+"${getRandomQuote()}"`;
       calculationDone = true;
       validateNames(); // Disable button after calculation
     });
